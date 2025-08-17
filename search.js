@@ -143,6 +143,7 @@ function interactive() {
 
 // Will clear error when msg is null
 export function showError(msg) {
+    const wrap = document.getElementById('search-wrap');
     const errorEl = document.getElementById('error');
     if (errorEl) {
         errorEl.textContent = msg;
@@ -158,12 +159,16 @@ export function clearError() { showError(null) }
 
 export function showLoadMessage(msg) {
     const loadingEl = document.getElementById('loading')
+    if (!loadingEl) return // The page might already be loaded.
+
     loadingEl.classList.add('show')
     loadingEl.textContent = msg
 }
 
 export function removeLoadMessages() {
     const loadingEl = document.getElementById('loading')
+    if (!loadingEl) return
+
     loadingEl.classList.remove('show')
 }
 
@@ -174,7 +179,6 @@ function searchInt() {
     const wrap = document.getElementById('search-wrap');
     const progress = document.getElementById('progress');
     const bar = document.getElementById('bar');
-    const loadingEl = document.getElementById('loading');
 
     const funny = [
         'Reticulating splines…',
@@ -255,17 +259,16 @@ function searchInt() {
 
     function doSearch() {
         if (btn.disabled) return; // already running or permanently disabled
-        const q = input.value.trim();
+        const q = input.value.trim()
         if (!q) {
             showError('Please type something to search.');
             return;
         }
-        clearError();
-        const done = startProgress();
+        clearError()
+        const done = startProgress()
         // Simulate work; replace with real navigation if desired
-        setTimeout(() => { done(); }, 1200 + Math.random() * 900);
-
-
+        setTimeout(() => { done(); }, 1200 + Math.random() * 900)
+        load(q)
     }
 
     btn.addEventListener('click', doSearch);

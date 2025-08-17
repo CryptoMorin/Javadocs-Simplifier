@@ -25,10 +25,10 @@ const alloworigin = url => simpleProxyRequest('http://alloworigin.com/get?url=',
 // Paid const justcors = url => simpleProxyRequest('https://justcors.com/.../', url) // https://justcors.com/
 
 // https://cors.sh/
-const CORSProxies = [corsproxy_io]
+const CORSProxies = [corsproxy_io, htmldriven, thingproxy, whateverorigin, alloworigin]
 
 async function proxifiedCORSRequest(url) {
-    for (proxy of CORSProxies) {
+    for (const proxy of CORSProxies) {
         console.log(`[${proxy.name}] Downloading ${url}`)
         try {
             return await proxy(url)
@@ -91,19 +91,19 @@ async function downloadAssets(url, html) {
     const stylesheetRequests = []
     const scriptRequests = []
 
-    for (stylesheet of stylesheets) {
+    for (const stylesheet of stylesheets) {
         stylesheetRequests.push(downloadAsset(url, stylesheet, 'href'))
     }
 
-    for (script of scripts) {
+    for (const script of scripts) {
         scriptRequests.push(downloadAsset(url, script, 'src'))
     }
 
     // Normalize promise objects and wait for all to finish
-    for (stylesheet of stylesheetRequests) {
+    for (const stylesheet of stylesheetRequests) {
         stylesheet.file = await (await stylesheet.file).text()
     }
-    for (stylesheet of scripts) {
+    for (const stylesheet of scripts) {
         script.file = await (await script.file).text()
     }
 
@@ -113,14 +113,14 @@ async function downloadAssets(url, html) {
 function normalizeAssets(html) {
     // Load CSS
     // html.html.adoptedStyleSheets = []
-    for (stylesheet of html.stylesheets) {
+    for (const stylesheet of html.stylesheets) {
         // This doesn't work because: 
         //   DOMException: Adopted style sheet's constructor document must match the document or shadow root's node document
         // const sheet = new CSSStyleSheet()
         // sheet.replaceSync(stylesheet)
         // html.html.adoptedStyleSheets.push(sheet)
 
-        const newStyle = this.document.createElement('link')
+        const newStyle = html.html.createElement('link')
         newStyle.setAttribute('rel', 'stylesheet')
         newStyle.setAttribute('type', 'text/css')
         newStyle.setAttribute('href', 'data:text/css;charset=UTF-8,' + encodeURIComponent(stylesheet.file))
@@ -133,7 +133,7 @@ function normalizeAssets(html) {
     }
 
     // Load JavaScripts
-    for (script of html.scripts) {
+    for (const script of html.scripts) {
         const scriptElement = html.createElement('script')
         scriptElement.textContent = script.file
 
@@ -148,7 +148,7 @@ function normalizeAssets(html) {
 function normalizeLinks(html, url) {
     console.log("Normalizing links...")
     const links = html.querySelectorAll('a')
-    for (link of links) {
+    for (const link of links) {
         if (link.href) {
             link.setAttribute('href', relativizeLink(link.getAttribute('href'), url))
         }
@@ -163,6 +163,9 @@ function removeUselessShit(html) {
     removeElementIfExists('#method-summary')
     removeElementIfExists('#field-detail')
     removeElementIfExists('#method-detail')
+    removeElementIfExists('#nested-class-summary')
+    removeElementIfExists('.inheritance')
+    removeElementIfExists('#enum-constant-detail')
     removeElementIfExists('.sub-title') // Remove the header package name
     removeElementIfExists('.notes') // e.g. "All Superinterfaces4"
     removeElementIfExists('.type-signature') // e.g. "public interface Class extends ..."
@@ -181,6 +184,18 @@ function removeUselessShit(html) {
 
         table.style.gridTemplateColumns = 'minmax(20%, max-content) minmax(20%, auto)'
     }
+
+    const enumConstSummary = doc.querySelector('#enum-constant-summary')
+    if (enumConstSummary) {
+        enumConstSummary.querySelector('h2').remove()
+    }
+
+    if (doc.querySelector('#enum-constant-summary')) {
+        removeElementIfExists('#field-summary')
+    }
+
+    // Older JavaDocs
+    removeElementIfExists('contentContainer div.details')
 }
 
 function replacePage(html) {
@@ -201,9 +216,33 @@ function checkIsJavadocsPage(html) {
 
 }
 
+const audio = new Audio('./Around the Horizon.mp3')
+async function playBackgroundMusic() {
+    audio.loop = true
+    try {
+        await audio.play()
+    } catch (error) {
+        // Mostly because user disabled autoplay.
+        console.warn("Failed to play audio: ", error)
+    }
+
+    const audioButton = document.querySelector('#audio-control')
+    const audioButtonImg = audioButton.querySelector('img')
+    audioButton.addEventListener("click", () => {
+        if (audio.paused) {
+            audio.play()
+            audioButtonImg.src = 'audio.png'
+        } else {
+            audio.pause()
+            audioButtonImg.src = 'no-audio.png'
+        }
+    });
+}
+
 export async function load(url) {
     const html = await downloadPage(url)
     replacePage(await downloadAssets(url, html))
+    audio.pause();
     console.log('Javadocs page loaded.')
 }
 
@@ -211,5 +250,15 @@ function instantRedirectIfAPI() {
     const queried = findWebsiteQuery()
     if (queried) {
         load(queried)
+        return true
+    } else {
+        return false
     }
 }
+
+async function reloadServer() {
+    await fetch('/reload')
+    window.location.reload(true)
+}
+
+if (!instantRedirectIfAPI()) playBackgroundMusic()

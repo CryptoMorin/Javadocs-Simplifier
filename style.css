@@ -35,12 +35,18 @@ canvas#bg {
     background: radial-gradient(1200px 800px at 10% 10%, #101626 0%, #0b0f14 60%, #070a0f 100%);
 }
 
-/* GitHub button (top-left) */
-#github {
-    position: fixed;
-    z-index: 4;
+#control-buttons {
+    display: grid;
     top: 16px;
     left: 16px;
+    position: absolute;
+    z-index: 4;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5em;
+}
+
+/* GitHub and audio buttons (top-left) */
+#github {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -54,7 +60,25 @@ canvas#bg {
     transition: transform .2s ease, background .2s ease, border-color .2s ease;
 }
 
-#github:hover {
+#audio-control {
+    cursor: pointer;
+    width: 3.7em;
+    height: 3.7em;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, .6);
+    border: 1px solid rgba(148, 163, 184, .22);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.control-button img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.control-button:hover {
     transform: translateY(-1px);
     background: rgba(17, 24, 39, .85);
     border-color: rgba(148, 163, 184, .35);
@@ -346,7 +370,7 @@ footer {
     position: fixed;
     z-index: 3;
     min-width: 260px;
-    background: #0b1220;
+    background: #0b2018;
     color: var(--text);
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(148, 163, 184, .14);
@@ -356,7 +380,7 @@ footer {
 
 #contextMenu .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     align-items: center;
     column-gap: 24px;
 }
@@ -366,15 +390,7 @@ footer {
     color: #c7d2fe;
     font-weight: 600;
     white-space: nowrap;
-}
-
-#contextMenu .cell.left {
     justify-self: start;
-}
-
-#contextMenu .cell.right {
-    justify-self: end;
-    text-align: right;
 }
 
 /* Focus styles */
