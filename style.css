@@ -1,18 +1,399 @@
-.loader {
-    border: 16px solid #f3f3f3;
-    border-top: 16px solid #3498db;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
+:root {
+    --bg: #0b0f14;
+    --panel: #0f1520;
+    --text: #e6e8eb;
+    --muted: #94a3b8;
+    --shadow: 0 10px 40px rgba(0, 0, 0, .5);
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+    overflow: hidden;
+    /* canvas backdrop handles scroll */
+}
+
+/* Fullscreen animated canvas backdrop */
+canvas#bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    background: radial-gradient(1200px 800px at 10% 10%, #101626 0%, #0b0f14 60%, #070a0f 100%);
+}
+
+/* GitHub button (top-left) */
+#github {
+    position: fixed;
+    z-index: 4;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--text);
+    background: rgba(17, 24, 39, .6);
+    border: 1px solid rgba(148, 163, 184, .22);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+
+#github:hover {
+    transform: translateY(-1px);
+    background: rgba(17, 24, 39, .85);
+    border-color: rgba(148, 163, 184, .35);
+}
+
+#github svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Layout */
+.overlay {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.stack {
+    width: min(900px, 92vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+header h1 {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: .3px;
+    text-align: center;
+    font-size: clamp(28px, 5vw, 48px);
+}
+
+header h1 span {
+    background: linear-gradient(90deg, #7c3aed, #06b6d4, #22d3ee, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Search bar wrapper */
+.search-wrap {
+    position: relative;
+    width: min(760px, 92vw);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 18px;
+    background: rgba(17, 24, 39, .6);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease, filter .2s ease;
+    isolation: isolate;
+}
+
+.search-wrap:hover {
+    transform: translateY(-1px);
+}
+
+/* Disabled state */
+.search-wrap.disabled {
+    opacity: .6;
+    filter: saturate(.7) grayscale(.1);
+}
+
+.search-input[disabled]::placeholder {
+    opacity: .3;
+}
+
+.search-btn[disabled],
+.search-input[disabled] {
+    cursor: not-allowed;
+}
+
+/* Error pulse + shake */
+.search-wrap.error {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, .5), var(--shadow);
+    animation: shake .35s ease;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translateX(-1px)
     }
 
-    100% {
-        transform: rotate(360deg);
+    20%,
+    80% {
+        transform: translateX(2px)
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translateX(-3px)
+    }
+
+    40%,
+    60% {
+        transform: translateX(3px)
+    }
+}
+
+/* Fancy gradient border on hover using a pseudo-element */
+.search-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    padding: 2px;
+    background: linear-gradient(120deg, #7c3aed, #22c55e, #06b6d4, #f59e0b, #ef4444, #7c3aed);
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity .25s ease, filter 1s linear;
+    filter: hue-rotate(0deg);
+    z-index: -1;
+}
+
+.search-wrap:hover::before {
+    opacity: 1;
+    animation: hue 5s linear infinite;
+}
+
+@keyframes hue {
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Magnifying glass icon (left) */
+.icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    opacity: .85;
+}
+
+/* Input */
+.search-input {
+    appearance: none;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    width: 100%;
+    font-size: 18px;
+    line-height: 20px;
+    padding: 8px 4px;
+    caret-color: #a78bfa;
+}
+
+.search-input::placeholder {
+    color: #93a1b1;
+    opacity: .5;
+}
+
+/* Circle search button (right) */
+.search-btn {
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: radial-gradient(circle at 30% 30%, #7c3aed, #06b6d4);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, .35);
+    transition: transform .15s ease, box-shadow .2s ease;
+    display: grid;
+    place-items: center;
+    color: white;
+}
+
+.search-btn:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 10px 28px rgba(6, 182, 212, .35);
+    animation: spinGrad 3s linear infinite;
+    background: conic-gradient(from 0deg, #7c3aed, #06b6d4, #22d3ee, #a78bfa, #7c3aed);
+}
+
+@keyframes spinGrad {
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Progress bar */
+.progress {
+    width: min(760px, 92vw);
+    height: 6px;
+    background: rgba(148, 163, 184, .15);
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+.progress.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.progress .bar {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #06b6d4, #7c3aed, #ef4444, #22c55e, #06b6d4);
+    background-size: 300% 100%;
+    animation: slide 1.4s linear infinite;
+}
+
+@keyframes slide {
+    to {
+        background-position: 300% 0;
+    }
+}
+
+/* Funny loading messages under progress */
+.loading-text {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 18px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+.loading-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Error text */
+.error-text {
+    font-size: 13px;
+    color: #fca5a5;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+.error-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Example tooltip under search */
+.hint {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    opacity: .9;
+}
+
+.hint code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    background: rgba(148, 163, 184, .08);
+    border: 1px solid rgba(148, 163, 184, .16);
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 14px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    z-index: 2;
+}
+
+/* Custom context menu for background */
+#contextMenu {
+    position: fixed;
+    z-index: 3;
+    min-width: 260px;
+    background: #0b1220;
+    color: var(--text);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(148, 163, 184, .14);
+    padding: 12px 14px;
+    display: none;
+}
+
+#contextMenu .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    column-gap: 24px;
+}
+
+#contextMenu .cell {
+    font-size: 13px;
+    color: #c7d2fe;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#contextMenu .cell.left {
+    justify-self: start;
+}
+
+#contextMenu .cell.right {
+    justify-self: end;
+    text-align: right;
+}
+
+/* Focus styles */
+.search-input:focus+.search-btn,
+.search-btn:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, .35);
+}
+
+canvas#bg:focus {
+    outline: none;
+}
+
+@media (max-width: 480px) {
+    .search-wrap {
+        padding: 14px;
+    }
+
+    .search-btn {
+        width: 42px;
+        height: 42px;
     }
 }

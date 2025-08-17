@@ -1,47 +1,215 @@
+import { showLoadMessage, removeLoadMessages, showError, clearError } from "./search.js";
 
 function findWebsiteQuery() {
-    let docURL = window.location.href
-    let params = []
-
-    // Filter out the website origin "xxx.github.io"
-    docURL = docURL.replace(window.location.origin, '');
-
-    // If /#/ found then we have URL parameters, grabbing the parameters part of the URL
-    if (docURL.indexOf('/#/') > -1) {
-        docURL = docURL.split('/#/')[1];
-        if (docURL != '') {
-
-            // omit the last forward slash if exist
-            if (docURL[docURL.length - 1] == '/') {
-                docURL = docURL.substring(0, docURL.length - 1);
-            }
-
-            // split the URL final string o get an object with all params 
-            params = docURL.split('/');
-            console.log(params);
-        }
+    const urlParams = new URLSearchParams(window.location.search);
+    const url = urlParams.get('url');
+    if (url) {
+        console.log("Using the predefined URL: " + url)
+        return url
     } else {
-        console.log('No URL parameters found');
+        return null
     }
 }
 
-async function simplifyEnumJavadocs(url) {
-    console.log(`Downloading javadocs page ${url}...`)
-    const htmlFile = await fetch(url).then(response => response.text())
+async function simpleProxyRequest(base, url) {
+    const encoded = encodeURIComponent(url)
+    return fetch(base + encoded)
+}
 
+const corsproxy_io = url => simpleProxyRequest('https://corsproxy.io/?url=', url) // https://corsproxy.io/
+const htmldriven = url => simpleProxyRequest('https://cors-proxy.htmldriven.com/?url=', url) // https://cors-proxy.htmldriven.com/
+const thingproxy = url => simpleProxyRequest('https://thingproxy.freeboard.io/fetch/', url) // https://github.com/Freeboard/thingproxy
+const whateverorigin = url => simpleProxyRequest('https://whateverorigin.org/get?url=', url) // https://whateverorigin.org/
+const alloworigin = url => simpleProxyRequest('http://alloworigin.com/get?url=', url) // https://github.com/Eiledon/alloworigin
+// https://developer.puter.com/tutorials/cors-free-fetch-api/ - Requires an entire library.
+// Paid const justcors = url => simpleProxyRequest('https://justcors.com/.../', url) // https://justcors.com/
+
+// https://cors.sh/
+const CORSProxies = [corsproxy_io]
+
+async function proxifiedCORSRequest(url) {
+    for (proxy of CORSProxies) {
+        console.log(`[${proxy.name}] Downloading ${url}`)
+        try {
+            return await proxy(url)
+        } catch (error) {
+            console.warn(`[${proxy.name}] Failed to download ${url}:`, error)
+        }
+    }
+}
+
+async function downloadPage(url) {
+    const htmlFile = await (await proxifiedCORSRequest(url)).text()
     console.log('Parsing the downloaded javadocs...')
     const parser = new DOMParser();
-    const html = parser.parseFromString(txt, 'text/html');
+    const html = parser.parseFromString(htmlFile, 'text/html');
 
-    html.querySelector('.method-summary').remove()
+    console.log("Response: " + htmlFile)
+    // html.querySelector('.method-summary').remove()
     return html
+}
+
+function relativizeLink(url, base) {
+    if (!url) throw Error('Relative url is invalid: ' + url + " (Base: " + base + ")")
+    if (!base) throw Error('Base url is invalid: ' + url + " (Relative: " + url + ")")
+    return new URL(url, base).href
+}
+
+class HTMLAsset {
+    constructor(url, file, node) {
+        this.url = url;
+        this.file = file;
+        this.node = node;
+    }
+}
+
+class HTML {
+    constructor(html, url, stylesheets, scripts) {
+        this.html = html;
+        this.url = url;
+        this.stylesheets = stylesheets;
+        this.scripts = scripts;
+    }
+}
+
+function downloadAsset(url, asset, linkAttribute) {
+    const relativeURL = asset.getAttribute(linkAttribute)
+    if (!relativeURL) {
+        console.error("No URL is defined for asset: ", asset)
+        throw Error("No URL is defined for asset: " + asset)
+    }
+
+    const absoluteURL = relativizeLink(relativeURL, url)
+    return new HTMLAsset(relativeURL, proxifiedCORSRequest(absoluteURL), asset)
+}
+
+async function downloadAssets(url, html) {
+    // Note: The href properties of all nodes always return the normalized absolute value.
+    const stylesheets = Array.from(html.querySelectorAll('link')).filter(x => x.rel === 'stylesheet')
+    const scripts = Array.from(html.querySelectorAll('link')).filter(x => x.src) // TODO Ignore inline scripts
+
+    const stylesheetRequests = []
+    const scriptRequests = []
+
+    for (stylesheet of stylesheets) {
+        stylesheetRequests.push(downloadAsset(url, stylesheet, 'href'))
+    }
+
+    for (script of scripts) {
+        scriptRequests.push(downloadAsset(url, script, 'src'))
+    }
+
+    // Normalize promise objects and wait for all to finish
+    for (stylesheet of stylesheetRequests) {
+        stylesheet.file = await (await stylesheet.file).text()
+    }
+    for (stylesheet of scripts) {
+        script.file = await (await script.file).text()
+    }
+
+    return new HTML(html, url, stylesheetRequests, scriptRequests)
+}
+
+function normalizeAssets(html) {
+    // Load CSS
+    // html.html.adoptedStyleSheets = []
+    for (stylesheet of html.stylesheets) {
+        // This doesn't work because: 
+        //   DOMException: Adopted style sheet's constructor document must match the document or shadow root's node document
+        // const sheet = new CSSStyleSheet()
+        // sheet.replaceSync(stylesheet)
+        // html.html.adoptedStyleSheets.push(sheet)
+
+        const newStyle = this.document.createElement('link')
+        newStyle.setAttribute('rel', 'stylesheet')
+        newStyle.setAttribute('type', 'text/css')
+        newStyle.setAttribute('href', 'data:text/css;charset=UTF-8,' + encodeURIComponent(stylesheet.file))
+        // const newStyle = html.html.createElement('style');
+        // newStyle.textContent = stylesheet
+        console.log('appending style to ', html.html.head, " -> ", stylesheet.file)
+        html.html.head.appendChild(newStyle);
+
+        stylesheet.node.remove()
+    }
+
+    // Load JavaScripts
+    for (script of html.scripts) {
+        const scriptElement = html.createElement('script')
+        scriptElement.textContent = script.file
+
+        // Append the <script> element to the document (e.g., <head> or <body>)
+        html.html.head.appendChild(scriptElement)
+        script.node.remove()
+    }
+
+    normalizeLinks(html.html, html.url)
+}
+
+function normalizeLinks(html, url) {
+    console.log("Normalizing links...")
+    const links = html.querySelectorAll('a')
+    for (link of links) {
+        if (link.href) {
+            link.setAttribute('href', relativizeLink(link.getAttribute('href'), url))
+        }
+    }
+}
+
+function removeUselessShit(html) {
+    const doc = html.html
+
+    const removeElementIfExists = selector => doc.querySelector(selector)?.remove()
+    removeElementIfExists('#method-summary-table')
+    removeElementIfExists('#method-summary')
+    removeElementIfExists('#field-detail')
+    removeElementIfExists('#method-detail')
+    removeElementIfExists('.sub-title') // Remove the header package name
+    removeElementIfExists('.notes') // e.g. "All Superinterfaces4"
+    removeElementIfExists('.type-signature') // e.g. "public interface Class extends ..."
+    removeElementIfExists('.sub-nav') // e.g. "public interface Class extends ..."
+
+    doc.querySelectorAll('#field-summary .col-first')?.forEach(x => x.remove())
+    const table = doc.querySelector('#field-summary .summary-table')
+    if (table) {
+        // Getting non-computed value requires finding the stylesheet that handles this
+        // and changing it there manually, which is a pain in the ass...
+        //
+        // const tableStyle = window.getComputedStyle(table);
+        // let grid = tableStyle['grid-template-columns']
+        // Remove the first element
+        // grid = grid.split(' ').slice(1).join(' ')
+
+        table.style.gridTemplateColumns = 'minmax(20%, max-content) minmax(20%, auto)'
+    }
 }
 
 function replacePage(html) {
     console.log('Replacing page...')
-    document.querySelector('html').innerHTML = html;
+
+    normalizeAssets(html)
+    removeUselessShit(html)
+
+    // Load the page itself
+    document.replaceChild(
+        document.importNode(html.html.documentElement, true),
+        document.documentElement
+    )
+    // document.querySelector('html').replaceWith(html)
 }
 
-const html = await simplifyEnumJavadocs('https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/meta/trim/TrimPattern.html')
-replacePage(html)
-console.log('Enum javadocs loaded.')
+function checkIsJavadocsPage(html) {
+
+}
+
+export async function load(url) {
+    const html = await downloadPage(url)
+    replacePage(await downloadAssets(url, html))
+    console.log('Javadocs page loaded.')
+}
+
+function instantRedirectIfAPI() {
+    const queried = findWebsiteQuery()
+    if (queried) {
+        load(queried)
+    }
+}
