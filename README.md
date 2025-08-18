@@ -2,6 +2,10 @@
 
 This is a simple website that simplifies (specifically enum JavaDoc pages) for end-user consumptions.
 
+You can access the website directly [here](https://cryptomorin.github.io/Javadocs-Simplifier).
+
+# API
+
 To use the API, you can use the following format:
 
 ```hs

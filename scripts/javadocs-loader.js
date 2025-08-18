@@ -1,4 +1,9 @@
-import { showLoadMessage, removeLoadMessages, showError, clearError } from "./search.js";
+import { showLoadMessage, showError, clearError } from "./search.js";
+
+function logMessage(messages) {
+    showLoadMessage(messages.join(' '))
+    console.log(...messages)
+}
 
 function findWebsiteQuery() {
     const urlParams = new URLSearchParams(window.location.search);
