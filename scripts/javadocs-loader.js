@@ -215,7 +215,7 @@ function isJavadocsPage(html) {
     return html.querySelector('body').classList.contains('class-declaration-page');
 }
 
-const audio = new Audio('/Around-the-Horizon.mp3')
+const audio = new Audio('./Around-the-Horizon.mp3')
 async function playBackgroundMusic() {
     audio.loop = true
     try {
@@ -267,7 +267,13 @@ async function reloadServer(locallyOnly) {
 }
 
 async function addDevControls() {
-    const request = await fetch('/is_dev', { method: 'GET' })
+    let request;
+    try {
+        request = await fetch('/is_dev', { method: 'GET' })
+    } catch (error) {
+        return
+    }
+
     if (request.ok) {
         const answer = await request.text()
         if (answer === "yes") {
