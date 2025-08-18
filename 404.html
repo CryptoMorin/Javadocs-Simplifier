@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 — Lost in Space</title>
+    <style>
+        :root {
+            --bg: #0b0e1a;
+            --ink: #e9ecff;
+            --muted: #a7b0d6;
+            --accent: #7c5cff;
+            --danger: #ff4d6d;
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            background: var(--bg);
+            color: var(--ink);
+            overflow: hidden;
+        }
+
+        /* Animated gradient nebula background */
+        .bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: radial-gradient(1200px 800px at 10% -10%, #1a1f45 0%, transparent 60%),
+                radial-gradient(1000px 700px at 110% 0%, #2a1a45 0%, transparent 60%),
+                radial-gradient(900px 600px at 50% 120%, #12253e 0%, transparent 60%),
+                var(--bg);
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(60px);
+            opacity: .5;
+            mix-blend-mode: screen;
+        }
+
+        .blob:nth-child(1) {
+            width: 40vmax;
+            height: 40vmax;
+            background: #7c5cff;
+            left: -10vmax;
+            top: -10vmax;
+            animation: drift1 22s ease-in-out infinite alternate;
+        }
+
+        .blob:nth-child(2) {
+            width: 36vmax;
+            height: 36vmax;
+            background: #09f;
+            right: -10vmax;
+            top: -8vmax;
+            animation: drift2 26s ease-in-out infinite alternate;
+        }
+
+        .blob:nth-child(3) {
+            width: 38vmax;
+            height: 38vmax;
+            background: #ff4d6d;
+            left: 20%;
+            bottom: -12vmax;
+            animation: drift3 28s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift1 {
+            from {
+                transform: translate(0, 0) rotate(0)
+            }
+
+            to {
+                transform: translate(8vmax, 6vmax) rotate(30deg)
+            }
+        }
+
+        @keyframes drift2 {
+            from {
+                transform: translate(0, 0) rotate(0)
+            }
+
+            to {
+                transform: translate(-6vmax, 8vmax) rotate(-25deg)
+            }
+        }
+
+        @keyframes drift3 {
+            from {
+                transform: translate(0, 0) rotate(0)
+            }
+
+            to {
+                transform: translate(6vmax, -6vmax) rotate(20deg)
+            }
+        }
+
+        /* Cursor spotlight */
+        #spotlight {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(250px 250px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, .08), transparent 65%);
+            transition: background-position .08s ease;
+        }
+
+        /* Scene */
+        .center {
+            position: relative;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: relative;
+            width: min(900px, 92vw);
+            border-radius: var(--radius);
+            padding: 36px 32px 40px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+            border: 1px solid rgba(255, 255, 255, .12);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .04);
+            transform-style: preserve-3d;
+            will-change: transform, filter;
+        }
+
+        .big404 {
+            margin: 16px 0 6px;
+            line-height: .85;
+            letter-spacing: -2px;
+            font-weight: 900;
+            font-size: clamp(96px, 18vw, 220px);
+            background: conic-gradient(from 180deg at 50% 50%, #fff 0%, #cfd6ff 20%, #c8b6ff 40%, #fff 60%, #b8c0ff 80%, #fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+            transform: translateZ(40px);
+        }
+
+        .subtitle {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: clamp(16px, 2.2vw, 20px);
+            transform: translateZ(35px);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            transform: translateZ(30px);
+        }
+
+        .btn {
+            appearance: none;
+            border: 0;
+            cursor: pointer;
+            font-weight: 800;
+            letter-spacing: .3px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .25);
+            color: #0b0e1a;
+            background: #fff;
+            transition: transform .15s ease, filter .2s ease;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05)
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .btn.alt {
+            background: linear-gradient(180deg, var(--accent), #5d42ff);
+            color: white
+        }
+
+        /* Glass shards for parallax layers */
+        .flake {
+            position: absolute;
+            inset: auto;
+            width: 140px;
+            height: 80px;
+            border-radius: 18px;
+            opacity: .16;
+            pointer-events: none;
+            transform-style: preserve-3d;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, .25);
+        }
+
+        .flake.one {
+            background: linear-gradient(180deg, rgba(0, 194, 113, 0.5), rgba(255, 255, 255, .05));
+            top: -20px;
+            left: 40px;
+            transform: translateZ(60px) rotate(2deg)
+        }
+
+        .flake.two {
+            background: linear-gradient(180deg, rgba(110, 0, 161, 0.5), rgba(26, 0, 99, 0.05));
+            bottom: -24px;
+            right: 30px;
+            width: 110px;
+            height: 70px;
+            transform: translateZ(70px) rotate(-6deg)
+        }
+
+        /* Glow that tightens towards cursor */
+        #glow {
+            position: absolute;
+            inset: -30%;
+            pointer-events: none;
+            border-radius: inherit;
+            mix-blend-mode: screen;
+            background: radial-gradient(40% 40% at var(--x, 50%) var(--y, 50%), rgba(124, 92, 255, .7), transparent 60%);
+            filter: blur(40px);
+            opacity: .35;
+            transform: translateZ(20px);
+        }
+
+        /* Tiny stars */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(#ffffff 1px, transparent 1px);
+            background-size: 3px 3px;
+            opacity: .08;
+        }
+
+        /* Subtle entrance animation */
+        .card {
+            animation: pop .8s cubic-bezier(.2, .9, .2, 1) both
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 20px, 0) scale(.98)
+            }
+
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+    <div class="stars"></div>
+    <div id="spotlight"></div>
+
+    <main class="center">
+        <section class="card" id="card" aria-label="404 not found">
+            <div id="glow"></div>
+            <div class="flake one"></div>
+            <div class="flake two"></div>
+            <h1 class="big404" aria-hidden="true">404</h1>
+            <p class="subtitle">Looks like this page drifted off course...</p>
+            <div class="actions">
+                <a class="btn alt" href="/">Go Home</a>
+                <a class="btn" href="https://github.com/CryptoMorin/Javadocs-Simplifier/issues">Report Issue</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Pointer-following tilt that makes the 404 "face" the mouse
+        const scene = document.querySelector('.center');
+        const card = document.getElementById('card');
+        const spotlight = document.getElementById('spotlight');
+        const glow = document.getElementById('glow');
+        const big404 = document.querySelector('.big404');
+
+        let px = 0.5, py = 0.5; // current normalized pointer
+        let tx = 0.5, ty = 0.5; // target normalized pointer
+
+        function onMove(e) {
+            const rect = scene.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            tx = Math.max(0, Math.min(1, x));
+            ty = Math.max(0, Math.min(1, y));
+        }
+
+        // Support touch
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', (e) => {
+            const t = e.touches[0]; if (!t) return; onMove({ clientX: t.clientX, clientY: t.clientY });
+        }, { passive: true });
+
+        function lerp(a, b, n) { return a + (b - a) * n }
+
+        function animate() {
+            // Smooth follow
+            px = lerp(px, tx, 0.12);
+            py = lerp(py, ty, 0.12);
+
+            const yaw = (px - 0.5) * 24;   // rotateY
+            const pitch = (0.5 - py) * 18; // rotateX
+            const depth = 1 + (1 - Math.hypot(px - 0.5, py - 0.5) * 2) * 0.06; // slight scale towards center
+
+            card.style.transform = `rotateX(${pitch}deg) rotateY(${yaw}deg) scale(${depth})`;
+
+            // Dynamic text shadow that "lights" from pointer
+            const sx = (px - 0.5) * -60; // shadow x
+            const sy = (py - 0.5) * -60; // shadow y
+            big404.style.textShadow = `${sx}px ${sy}px 60px rgba(124,92,255,.6), ${-sx * 0.4}px ${-sy * 0.4}px 30px rgba(0, 153, 255, .45)`;
+
+            // Spotlight + glow positions
+            const posx = (px * 100).toFixed(2) + '%';
+            const posy = (py * 100).toFixed(2) + '%';
+            spotlight.style.setProperty('--x', posx);
+            spotlight.style.setProperty('--y', posy);
+            glow.style.setProperty('--x', posx);
+            glow.style.setProperty('--y', posy);
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Hide spotlight when mouse leaves the window
+        window.addEventListener('mouseleave', () => {
+            spotlight.style.opacity = '0';
+        });
+        window.addEventListener('mouseenter', () => {
+            spotlight.style.opacity = '1';
+        });
+
+        // Optional: keyboard wiggle for fun accessibility
+        window.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                card.animate([
+                    { transform: card.style.transform + ' translateZ(0)' },
+                    { transform: card.style.transform + ' translateZ(25px)' },
+                    { transform: card.style.transform + ' translateZ(0)' }
+                ], { duration: 350, easing: 'cubic-bezier(.2,.9,.2,1)' });
+            }
+        });
+    </script>
+</body>
+
+</html>

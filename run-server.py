@@ -4,6 +4,7 @@ import http.server
 import socketserver
 import webbrowser
 import _thread
+from typing import Optional
 
 PORT = 8000
 server: socketserver.TCPServer
@@ -54,6 +55,23 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle preflight requests for CORS
         self.send_response(200)
         self.end_headers()
+
+    def send_error(self,
+                   code: int,
+                   message: Optional[str] = None,
+                   explain: Optional[str] = None):
+        if code == 404:
+            try:
+                # Serve your custom 404.html
+                with open("404.html", "rb") as f:
+                    self.send_response(404)
+                    self.send_header("Content-type", "text/html")
+                    self.end_headers()
+                    self.wfile.write(f.read())
+                return
+            except FileNotFoundError:
+                pass # fallback to default behavior
+        super().send_error(code, message, explain)
 
 def run_server():
     with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
