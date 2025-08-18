@@ -16,21 +16,31 @@
     <!-- <meta property="og:image" itemprop="image primaryImageOfPage" content="resources/images/favicon.gif"> -->
     <meta content="#2751b3" data-react-helmet="true" name="theme-color">
 
-    <link rel="icon" type="image/xicon" href="images/favicon.png">
     <link rel="stylesheet" type="text/css" href="styles/main.css">
     <link rel="stylesheet" type="text/css" href="styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="styles/search.css">
+    <link rel="stylesheet" type="text/css" href="styles/context-menu.css">
 
     <script type="module" src="scripts/javadocs-loader.js"></script>
+    <script type="module" src="scripts/background.js"></script>
+    <script type="module" src="scripts/context-menu.js"></script>
     <script type="module" src="scripts/search.js"></script>
+
+    <script type="module">
+        import * as portal from './scripts/script-portal.js';
+        portal.javadocsModule()
+        portal.searchModule()
+        portal.contextMenuModule()
+        portal.backgroundModule()
+    </script>
 </head>
 
 <body>
     <!-- GitHub button -->
     <div id="control-buttons">
         <div class="button-container">
-            <a id="github" class="button" href="https://github.com/CryptoMorin/Javadocs-Simplifier"
-                target="_blank" rel="noopener noreferrer" aria-label="GitHub repository">
+            <a id="github" class="button" href="https://github.com/CryptoMorin/Javadocs-Simplifier" target="_blank"
+                rel="noopener noreferrer" aria-label="GitHub repository">
                 <img src="images/github.svg" alt="GitHub Logo" />
                 <span>GitHub</span>
             </a>
@@ -106,7 +116,7 @@
         <div class="grid">
             <div class="cell">Author: Crypto Morin</div>
             <div class="cell">v1.0.0</div>
-            <div class="cell">With the help of ChatGPT v4</div>
+            <div class="cell">With the help of ChatGPT v4 + Grok</div>
         </div>
     </div>
 

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Invalid API Request</title>
+    <meta name="description" content="Error page for Invalid API Request (template description included)." />
+    <script type="module" src="../scripts/api.js"></script>
+    <script type="module">
+        import * as portal from '../scripts/script-portal.js';
+        portal.apiErrorModule()
+    </script>
+    <style>
+        :root {
+            --bg: #0b0c0f;
+            --fg: #e7e9ee;
+            --muted: #9aa3b2;
+            --card: #151822;
+            --accent: #ff7a7a;
+            --accent-2: #ffd166;
+            --ring: rgba(255, 122, 122, 0.35);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f7f8fb;
+                --fg: #101623;
+                --muted: #4d5461;
+                --card: #ffffff;
+                --accent: #e11d48;
+                --accent-2: #b45309;
+                --ring: rgba(225, 29, 72, 0.15);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+            background:
+                linear-gradient(135deg, rgba(255, 122, 122, 0.12) 0%, transparent 50%),
+                linear-gradient(225deg, rgba(255, 209, 102, 0.10) 0%, transparent 50%),
+                radial-gradient(1000px 800px at 80% -20%, rgba(255, 122, 122, .12), transparent 60%),
+                radial-gradient(900px 700px at -20% 110%, rgba(255, 209, 102, .10), transparent 60%),
+                var(--bg);
+            color: var(--fg);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background-attachment: fixed;
+        }
+
+        .card {
+            width: min(720px, 100%);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02)), var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            padding: 28px 28px 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 12px;
+            background: rgba(255, 122, 122, 0.12);
+            color: var(--accent);
+            border: 1px solid var(--ring);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        h1 {
+            margin: 12px 0 8px;
+            font-size: clamp(22px, 3.2vw, 32px);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .lead {
+            font-size: 15px;
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px 16px;
+            margin: 18px 0 8px;
+        }
+
+        .meta dt {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta dd {
+            margin: 4px 0 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: transparent;
+            color: var(--fg);
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform .08s ease, background .2s ease, border-color .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .btn:focus {
+            outline: 3px solid var(--ring);
+            outline-offset: 2px;
+        }
+
+        .btn.primary {
+            background: var(--fg);
+            color: var(--bg);
+            border-color: var(--fg);
+        }
+
+        details {
+            margin-top: 16px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.12);
+            padding-top: 14px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .header {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header svg {
+            flex: 0 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card" role="main" aria-labelledby="title">
+        <div class="header">
+            <span class="badge" aria-label="Client error">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M12 3l9 16H3L12 3z" stroke="currentColor" stroke-width="2" fill="none" />
+                    <circle cx="12" cy="16" r="1.25" fill="currentColor" />
+                    <path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                400 · Invalid API Request
+            </span>
+        </div>
+
+        <h1 id="title">We couldn't process your request</h1>
+
+        <p id="error-description" class="lead muted" data-template="true">
+            {{ERROR_DESCRIPTION}}
+        </p>
+
+        <dl class="meta" aria-label="Request metadata">
+            <div>
+                <dt>Timestamp</dt>
+                <dd id="timestamp">{{TIMESTAMP_ISO}}</dd>
+            </div>
+            <div>
+                <dt>Status</dt>
+                <dd>400</dd>
+            </div>
+            <div>
+                <dt>Endpoint</dt>
+                <dd><code id="endpoint">{{ENDPOINT}}</code></dd>
+            </div>
+            <div>
+                <dt>Requested URL</dt>
+                <dd><code id="requested-url">{{REQUESTED_URL}}</code></dd>
+            </div>
+        </dl>
+
+        <div class="actions" role="group" aria-label="Suggested actions">
+            <button class="btn primary" id="retry">Retry</button>
+            <button class="btn" id="go-back">Go back</button>
+            <a class="btn" id="home" href="/">Home</a>
+        </div>
+
+        <details>
+            <summary>What you can try</summary>
+            <ul class="muted">
+                <li>Ensure required parameters are present and correctly typed.</li>
+                <li>Make sure the URL is encoded properly.</li>
+                <li>The JavaDocs URL you requested actually points to an accessible online javadoc .html page.</li>
+            </ul>
+        </details>
+    </main>
+</body>
+
+</html>

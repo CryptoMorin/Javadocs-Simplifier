@@ -3,6 +3,7 @@
 import http.server
 import socketserver
 import webbrowser
+import os
 import _thread
 from typing import Optional
 
@@ -11,6 +12,21 @@ server: socketserver.TCPServer
 
 # class RequestHandler(socketserver.StreamRequestHandler):
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
+    # Allow requesting HTML pages without explicitly specifying the .html extension.
+    def translate_path(self, path: str):
+        # Call the parent class's translate_path to get the initial file path
+        path = super().translate_path(path)
+        
+        # If the path doesn't end with a file extension and isn't a directory
+        if not os.path.splitext(path)[1] and not os.path.isdir(path):
+            # Append .html to the path
+            html_path = path + '.html'
+            # Check if the .html file exists
+            if os.path.exists(html_path):
+                return html_path
+        
+        return path
+    
     def do_GET(self) -> None:
         if self.path == '/is_dev':
             self.send_response(200)

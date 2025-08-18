@@ -5,17 +5,6 @@ function logMessage(messages) {
     console.log(...messages)
 }
 
-function findWebsiteQuery() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const url = urlParams.get('url');
-    if (url) {
-        console.log("Using the predefined URL: " + url)
-        return url
-    } else {
-        return null
-    }
-}
-
 async function simpleProxyRequest(base, url) {
     const encoded = encodeURIComponent(url)
     return fetch(base + encoded)
@@ -48,9 +37,6 @@ async function downloadPage(url) {
     console.log('Parsing the downloaded javadocs...')
     const parser = new DOMParser();
     const html = parser.parseFromString(htmlFile, 'text/html');
-
-    console.log("Response: " + htmlFile)
-    // html.querySelector('.method-summary').remove()
     return html
 }
 
@@ -199,6 +185,14 @@ function removeUselessShit(html) {
         removeElementIfExists('#field-summary')
     }
 
+    const headers = doc.querySelectorAll('#field-summary h2')
+    for (const header of headers) {
+        if (header.textContent === "Field Summary") {
+            header.remove()
+            break
+        }
+    }
+
     // Older JavaDocs
     removeElementIfExists('contentContainer div.details')
 }
@@ -217,11 +211,11 @@ function replacePage(html) {
     // document.querySelector('html').replaceWith(html)
 }
 
-function checkIsJavadocsPage(html) {
-
+function isJavadocsPage(html) {
+    return html.querySelector('body').classList.contains('class-declaration-page');
 }
 
-const audio = new Audio('./Around the Horizon.mp3')
+const audio = new Audio('/Around the Horizon.mp3')
 async function playBackgroundMusic() {
     audio.loop = true
     try {
@@ -244,26 +238,23 @@ async function playBackgroundMusic() {
     });
 }
 
-export async function load(url) {
+export async function load(url, api) {
     if (url === 'reload') {
         reloadServer(false)
         return
     }
 
     const html = await downloadPage(url)
+    if (!isJavadocsPage(html)) {
+        const err = "The specified URL doesn't point to a javadoc page."
+        if (!api) showError(err)
+        return err
+    }
+
     replacePage(await downloadAssets(url, html))
     audio.pause();
     console.log('Javadocs page loaded.')
-}
-
-function instantRedirectIfAPI() {
-    const queried = findWebsiteQuery()
-    if (queried) {
-        load(queried)
-        return true
-    } else {
-        return false
-    }
+    return true
 }
 
 async function reloadServer(locallyOnly) {
@@ -286,7 +277,7 @@ async function addDevControls() {
     }
 }
 
-if (!instantRedirectIfAPI()) {
+export function runModule() {
     playBackgroundMusic()
     addDevControls()
 }

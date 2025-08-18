@@ -1,0 +1,46 @@
+@import './variables.css';
+
+#contextMenu {
+    position: fixed;
+    z-index: 3;
+    min-width: 260px;
+    background: #0b2018;
+    color: var(--text);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(148, 163, 184, .14);
+    padding: 12px 14px;
+    display: block;
+    transform: scale(0);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#contextMenu.show {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+#contextMenu .grid {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+    column-gap: 24px;
+}
+
+#contextMenu .cell {
+    font-size: 13px;
+    color: #c7d2fe;
+    font-weight: 600;
+    white-space: nowrap;
+    justify-self: start;
+
+    padding: 12px;
+    text-align: center;
+    cursor: default;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#contextMenu .cell:last-child {
+    border-bottom: none;
+}

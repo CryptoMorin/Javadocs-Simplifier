@@ -1,10 +1,4 @@
-:root {
-    --bg: #0b0f14;
-    --panel: #0f1520;
-    --text: #e6e8eb;
-    --muted: #94a3b8;
-    --shadow: 0 10px 40px rgba(0, 0, 0, .5);
-}
+@import './variables.css';
 
 * {
     box-sizing: border-box
@@ -79,34 +73,6 @@ footer {
     font-size: 12px;
     color: var(--muted);
     z-index: 2;
-}
-
-/* Custom context menu for background */
-#contextMenu {
-    position: fixed;
-    z-index: 3;
-    min-width: 260px;
-    background: #0b2018;
-    color: var(--text);
-    border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(148, 163, 184, .14);
-    padding: 12px 14px;
-    display: none;
-}
-
-#contextMenu .grid {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    align-items: center;
-    column-gap: 24px;
-}
-
-#contextMenu .cell {
-    font-size: 13px;
-    color: #c7d2fe;
-    font-weight: 600;
-    white-space: nowrap;
-    justify-self: start;
 }
 
 /* Focus styles */
