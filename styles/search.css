@@ -119,10 +119,11 @@
     opacity: .5;
 }
 
-/* Circle search button (right) */
+/* Magnifying glass + Circle search button (right) */
 .search-wrap img {
-    /* White arrow */
+    /* White */
     filter: brightness(0) saturate(100%) invert(96%) sepia(96%) saturate(1%) hue-rotate(60deg) brightness(104%) contrast(100%);
+    user-select: none;
 }
 
 .search-btn {
@@ -219,6 +220,7 @@
 
 /* Example tooltip under search */
 .hint {
+    user-select: none;
     font-size: 12px;
     color: var(--muted);
     text-align: center;
@@ -227,7 +229,6 @@
 
 .hint code {
     display: inline-flex;
-    user-select: none;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     background: rgba(148, 163, 184, .08);
     border: 1px solid rgba(148, 163, 184, .16);

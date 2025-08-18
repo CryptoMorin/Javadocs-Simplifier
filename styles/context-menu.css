@@ -4,7 +4,7 @@
     position: fixed;
     z-index: 3;
     min-width: 260px;
-    background: #0b2018;
+    background: var(--panel);
     color: var(--text);
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(148, 163, 184, .14);
@@ -30,7 +30,7 @@
 
 #contextMenu .cell {
     font-size: 13px;
-    color: #c7d2fe;
+    color: var(--text);
     font-weight: 600;
     white-space: nowrap;
     justify-self: start;
