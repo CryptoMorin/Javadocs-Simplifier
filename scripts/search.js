@@ -179,6 +179,12 @@ function searchInt() {
     const wrap = document.getElementById('search-wrap');
     const progress = document.getElementById('progress');
     const bar = document.getElementById('bar');
+    const exampleText = document.querySelector('.hint code')
+
+    exampleText.addEventListener("click", () => {
+        const searchBar = document.getElementById('query')
+        searchBar.value = exampleText.textContent
+    });
 
     const funny = [
         'Reticulating splines…',
@@ -292,7 +298,7 @@ function contextMenu() {
     function hide() { menu.style.display = 'none'; }
 
     document.addEventListener('contextmenu', (e) => {
-        const insideSearch = !!e.target.closest('#search-wrap');
+        const insideSearch = !!e.target.closest('#search-wrap, button, a');
         if (!insideSearch) {
             e.preventDefault();
             showAt(e.clientX, e.clientY);

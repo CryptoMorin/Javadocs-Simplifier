@@ -1,0 +1,95 @@
+#control-buttons {
+    display: grid;
+    top: 16px;
+    left: 16px;
+    position: absolute;
+    z-index: 4;
+    grid-template-columns: 0fr 0fr 0fr 0fr;
+    gap: 0.7em;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, .6);
+    border: 1px solid rgba(148, 163, 184, .22);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.button:hover {
+    transform: scale(1.1);
+    background: rgba(17, 24, 39, .85);
+    border-color: rgba(148, 163, 184, .35);
+}
+
+#control-buttons button {
+    cursor: pointer;
+    width: 3.7em;
+    height: 3.7em;
+}
+
+.button img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+#github {
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    min-width: max-content;
+}
+
+#github img {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    filter: brightness(0) saturate(100%) invert(15%) sepia(77%) saturate(1525%) hue-rotate(215deg) brightness(86%) contrast(92%);
+}
+
+#info-button img {
+    filter: brightness(0) saturate(100%) invert(38%) sepia(100%) saturate(521%) hue-rotate(159deg) brightness(87%) contrast(92%);
+}
+
+
+
+/* Button Hover Popup */
+
+.button-container {
+    position: relative;
+}
+
+.popup-text {
+    visibility: hidden;
+    width: 13em;
+    background-color: #292929;
+    color: #9affc4;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 10px;
+    position: absolute;
+    z-index: 5;
+    top: 120%;
+    margin-left: -50px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.popup-text::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 20px;
+    border: 8px solid transparent;
+    border-bottom-color: #333;
+}
+
+.button:hover+.popup-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(10px);
+}

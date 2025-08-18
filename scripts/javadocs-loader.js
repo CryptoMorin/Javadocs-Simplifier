@@ -231,15 +231,20 @@ async function playBackgroundMusic() {
     audioButton.addEventListener("click", () => {
         if (audio.paused) {
             audio.play()
-            audioButtonImg.src = 'audio.png'
+            audioButtonImg.src = 'images/audio.png'
         } else {
             audio.pause()
-            audioButtonImg.src = 'no-audio.png'
+            audioButtonImg.src = 'images/no-audio.png'
         }
     });
 }
 
 export async function load(url) {
+    if (url === 'reload') {
+        reloadServer(false)
+        return
+    }
+
     const html = await downloadPage(url)
     replacePage(await downloadAssets(url, html))
     audio.pause();
@@ -256,9 +261,27 @@ function instantRedirectIfAPI() {
     }
 }
 
-async function reloadServer() {
-    await fetch('/reload')
-    window.location.reload(true)
+async function reloadServer(locallyOnly) {
+    console.log("Reloading...")
+    if (!locallyOnly) {
+        const answer = await fetch('/reload', { method: 'POST' })
+        console.log("Reload answer: ", answer)
+    }
+    window.location.reload(true) // Ctrl + F5
 }
 
-if (!instantRedirectIfAPI()) playBackgroundMusic()
+async function addDevControls() {
+    const request = await fetch('/is_dev', { method: 'GET' })
+    const answer = await request.text()
+    if (answer === "yes") {
+        console.log("Initiating Dev Controls...")
+        const reloadBtn = document.getElementById('reload-button')
+        reloadBtn.style.display = 'inline-flex'
+        reloadBtn.addEventListener("click", () => reloadServer(true))
+    }
+}
+
+if (!instantRedirectIfAPI()) {
+    playBackgroundMusic()
+    addDevControls()
+}
