@@ -218,6 +218,9 @@ function isJavadocsPage(html) {
 const audio = new Audio('./Around-the-Horizon.mp3')
 async function playBackgroundMusic() {
     audio.loop = true
+
+    // Unfortunately there is no way for us to actually suppress the 404 error
+    // thrown by this. The browser itself will always print these errors.
     try {
         await audio.play()
     } catch (error) {

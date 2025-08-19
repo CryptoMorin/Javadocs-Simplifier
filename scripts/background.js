@@ -1,6 +1,6 @@
 /** Interactive background with floating circles + autonomous slow drift + click ripples + mouse interaction + mouse connections **/
 export function runModule() {
-    const canvas = document.getElementById('bg');
+    const canvas = document.querySelector('canvas.celestial-globes');
     const ctx = canvas.getContext('2d');
     let DPR = Math.min(window.devicePixelRatio || 1, 2);
     const circles = [];
@@ -30,7 +30,8 @@ export function runModule() {
             vx: rand(-.06, .06) * DPR, vy: rand(-.06, .06) * DPR,
 
             // Color
-            hue: rand(180, 320), alpha: rand(.08, .22),
+            alpha: rand(.08, 0.8),
+            hue: rand(180, 320),
 
             // Fuck is this?
             nx: rand(0, 6.28), ny: rand(0, 6.28),
@@ -46,8 +47,11 @@ export function runModule() {
         ripples.push(
             {
                 x: x * DPR, y: y * DPR,
-                r: 0,
-                alpha: 0.6, hue: rand(180, 320),
+                r: 0, // radius
+
+                // Color
+                alpha: 0.6,
+                hue: rand(180, 320),
 
                 isPointInside: function (x, y) {
                     const distance = Math.sqrt(
@@ -132,6 +136,26 @@ export function runModule() {
                 c.vx *= s; c.vy *= s;
             }
 
+            // Be affected by one ripple at a time.
+            if (isInsideRipple && c.lastRippleTarget !== interactingRipple) {
+                if (c.alphaStep !== null && c.alphaStep !== undefined) {
+                    if (c.alphaStep < 0) c.alphaStep = -c.alphaStep;
+                } else {
+                    c.alphaStep = 0
+                }
+                c.lastRippleTarget = interactingRipple
+            }
+
+            if (c.alphaStep !== null && c.alphaStep !== undefined) {
+                if (c.alphaStep < 0) {
+                    c.alphaStep += 0.01
+                    if (c.alphaStep >= 0) c.alphaStep = null
+                } else {
+                    if (c.alpha + c.alphaStep >= 1) c.alphaStep = -c.alphaStep
+                    else c.alphaStep += 0.01
+                }
+            }
+
             // motion + friction + soft bounds
             c.x += c.vx; c.y += c.vy;
             c.vx *= 0.98; c.vy *= 0.98; // stronger damping
@@ -142,13 +166,8 @@ export function runModule() {
 
             // Draw circle
             const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
-            if (isInsideRipple && c.lastRippleTarget !== interactingRipple) {
-                c.hue = rand(180, 320)
-                c.lastRippleTarget = interactingRipple
-            }
-
-            grad.addColorStop(0, `hsla(${c.hue}, 80%, 60%, ${c.alpha})`);
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            grad.addColorStop(0, `hsla(${c.hue}, 80%, 60%, ${c.alpha + Math.abs(c.alphaStep || 0)})`);
+            grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
@@ -163,11 +182,11 @@ export function runModule() {
                 const dx = mx - c.x; const dy = my - c.y; const d = Math.hypot(dx, dy);
                 if (d < connectR) {
                     const t = 1 - d / connectR; // 0..1
-                    const alpha = Math.pow(t, 2) * 0.35; // stronger when close
+                    const alpha = Math.pow(t, 2) * 0.65; // stronger when close
                     ctx.beginPath();
                     ctx.moveTo(c.x, c.y);
                     ctx.lineTo(mx, my);
-                    ctx.strokeStyle = `rgba(148,163,184, ${alpha.toFixed(3)})`;
+                    ctx.strokeStyle = `hsla(${c.hue}, 80%, 60%, ${alpha.toFixed(3)})`;
                     ctx.lineWidth = Math.max(0.5, 1.2 * DPR * (t));
                     ctx.stroke();
                 }

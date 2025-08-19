@@ -1,3 +1,6 @@
+@import './variables.css';
+@import './animations.css';
+
 /* Search bar wrapper */
 .search-wrap {
     position: relative;
@@ -11,6 +14,9 @@
     box-shadow: var(--shadow);
     transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease, filter .2s ease;
     isolation: isolate;
+
+    /* Imported from animations.css */
+    animation: 1s ease-out 0s 1 slideInFromBelow;
 }
 
 .search-wrap:hover {
@@ -126,6 +132,23 @@
     user-select: none;
 }
 
+/* Focus styles */
+.search-input:focus+.search-btn,
+.search-btn:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, .35);
+}
+
+@media (max-width: 480px) {
+    .search-wrap {
+        padding: 14px;
+    }
+
+    .search-btn {
+        width: 42px;
+        height: 42px;
+    }
+}
+
 .search-btn {
     border: 0;
     outline: 0;
@@ -154,6 +177,9 @@
         filter: hue-rotate(360deg);
     }
 }
+
+
+
 
 /* Progress bar */
 .progress {
@@ -188,6 +214,8 @@
     }
 }
 
+
+
 /* Funny loading messages under progress */
 .loading-text {
     font-size: 13px;
@@ -203,6 +231,8 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+
 
 /* Error text */
 .error-text {
@@ -225,6 +255,9 @@
     color: var(--muted);
     text-align: center;
     opacity: .9;
+
+    /* Imported from animations.css */
+    animation: 1s ease-out 0s 1 slideInFromBelow;
 }
 
 .hint code {
