@@ -78,8 +78,17 @@ canvas.page-color-fill {
 
 .vertical-separator {
     width: 1px;
+    min-width: 1px;
+    /* For flex box */
     height: 100%;
     background-color: green;
+}
+
+.color-picker-container {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
 }
 
 .color-picker-btn {
@@ -100,8 +109,8 @@ canvas.page-color-fill {
 
 .color-picker.container {
     position: absolute;
-    margin-left: 150px;
-    margin-top: 580px;
+    top: 50px;
+    left: -200px;
 
     visibility: hidden;
     opacity: 0;
@@ -121,6 +130,9 @@ body.dark-theme .color-picker.container {
     background-color: #181818;
 }
 
+body.dark-theme .color-picker.container * {
+    border-color: black;
+}
 
 .color-picker.container::before {
     content: '';
@@ -133,6 +145,10 @@ body.dark-theme .color-picker.container {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-bottom: 10px solid white;
+}
+
+body.dark-theme .color-picker.container::before {
+    border-bottom-color: #181818;
 }
 
 /* Reversing animation doesn't work here... */

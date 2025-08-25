@@ -13,3 +13,5 @@
 * Find a way to fix issues with ThemeGenerator and `transition` animations causing `getComputedStyle()` to return invalid values during theme switches. (The current workaround still requires 100ms delay, see `header.html`)
 * Reloads on JAR Mode javadocs don't go back to the loaded page, they start from the index.html of the jar.
 * Themes aren't properly applied to `.member-signature` elements. They stay white.
+* `/is_dev` request should be hardcoded for local tests and removed on GitHub Action processing.
+* Make the website more responsive in phones. A lot of shit currently breaks.
