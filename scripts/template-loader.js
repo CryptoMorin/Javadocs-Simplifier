@@ -1,7 +1,11 @@
 const templates = new Map()
 
+function getTemplatePath(name) {
+    return `../templates/${name}.html`
+}
+
 async function loadTemplate(name) {
-    const request = await fetch(`../templates/${name}.html`)
+    const request = await fetch(getTemplatePath(name))
     if (!request.ok) {
         if (request.status === 404) return null
         else throw new Error(`Request failed for template '${name}': ${request.statusText}`)
@@ -13,7 +17,7 @@ async function loadTemplate(name) {
     return parser.parseFromString(text, 'text/html');
 }
 
-export async function getTemplate(name) {
+async function getTemplate0(name) {
     let doc = templates.get(name)
     if (doc) return doc
 
@@ -23,6 +27,15 @@ export async function getTemplate(name) {
     doc = new HTMLTemplate(name, template)
     templates.set(name, doc)
     return doc
+}
+
+export async function getTemplate(name) {
+    const template = getTemplate0(name)
+    if (!template) {
+        const path = new URL(getTemplatePath(name), document.baseURI).href
+        throw new Error(`Unknown template: ${name}, at ${window.location.href}/${document.baseURI} -> ${path}`)
+    }
+    return template
 }
 
 export function getRootDocument(importMeta) {
@@ -229,7 +242,7 @@ class TemplateAnchorHTMLElement extends HTMLElement {
         }
 
         try {
-            const loadedTemplate = await getTemplate(templatePath)
+            const loadedTemplate = await getTemplate0(templatePath)
             if (!loadedTemplate) {
                 targetDoc.innerHTML = `<p>Unknown template: ${templatePath}</p>`;
                 return;
