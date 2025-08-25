@@ -3,13 +3,14 @@
 
 <head>
     <meta charset="utf-8" />
+    <base target="_self" href="../" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Invalid API Request</title>
     <meta name="description" content="Error page for Invalid API Request (template description included)." />
-    <script type="module" src="../scripts/api.js"></script>
+    <script type="module" src="./scripts/api.js"></script>
     <script type="module">
-        import * as portal from '../scripts/script-portal.js';
-        portal.apiErrorModule()
+        import { handleError } from './scripts/api.js'
+        handleError()
     </script>
     <style>
         :root {
@@ -224,7 +225,7 @@
         <div class="actions" role="group" aria-label="Suggested actions">
             <button class="btn primary" id="retry">Retry</button>
             <button class="btn" id="go-back">Go back</button>
-            <a class="btn" id="home" href="../">Home</a>
+            <a class="btn" id="home" href="./">Home</a>
         </div>
 
         <details>

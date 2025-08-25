@@ -27,10 +27,13 @@
     <!-- <script type="module" src="scripts/shooting-stars.js"></script> -->
 
     <script type="module">
-        import * as portal from './scripts/script-portal.js';
-        portal.indexModule()
-        portal.searchModule()
-        portal.backgroundModule()
+        import { runModule as indexModule } from './scripts/index.js'
+        import { runModule as searchModule } from './scripts/search.js'
+        import { runModule as backgroundModule } from './scripts/background.js'
+
+        indexModule()
+        searchModule()
+        backgroundModule()
     </script>
 </head>
 

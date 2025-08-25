@@ -4,10 +4,11 @@
 <head>
     <title>JavaDocs Simplifier API v1</title>
     <meta charset="UTF-8" />
-    <script type="module" src="../scripts/api.js"></script>
+    <base target="_self" href="../" />
+
     <script type="module">
-        import * as portal from '../scripts/script-portal.js';
-        portal.apiModule()
+        import { runModule } from './scripts/api.js'
+        runModule()
     </script>
 </head>
 

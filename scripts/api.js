@@ -1,7 +1,7 @@
-import { load } from "./javadocs-loader.js"
+import { JavadocsLoader } from "./javadocs-loader.js"
 
 function error(msg, url, timestamp, endpoint) {
-    const data = { message: msg, url,timestamp, endpoint }
+    const data = { message: msg, url, timestamp, endpoint }
     window.location.href = "../api/error?" + new URLSearchParams(data).toString();
 }
 
@@ -21,7 +21,7 @@ export function handleError() {
         if (history.length > 1) {
             history.back()
         } else {
-            window.location.href = '/'
+            window.location.href = './'
         }
     });
 
@@ -57,8 +57,9 @@ export async function runModule() {
         p.textContent = "Loading " + queried + "..."
         document.body.appendChild(p)
 
-        const error = await load(queried, true)
-        if (error !== true) {
+        try {
+            const result = await new JavadocsLoader().load(queried)
+        } catch (error) {
             localError(error, queried)
             return false
         }
