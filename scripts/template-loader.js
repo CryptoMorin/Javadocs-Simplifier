@@ -50,7 +50,7 @@ export function getRootDocument(importMeta) {
     return shadowRoot
 }
 
-// This is required because scripts have internal flags that mark
+// This is required because scripts have internal flags that mark.
 // scripts as "already started": https://html.spec.whatwg.org/multipage/scripting.html#already-started
 function effectivelyCopyScript(scriptElement) {
     const script = document.createElement('script');
