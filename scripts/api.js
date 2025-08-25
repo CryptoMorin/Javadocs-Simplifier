@@ -2,7 +2,7 @@ import { JavadocsLoader } from "./javadocs-loader.js"
 
 function error(msg, url, timestamp, endpoint) {
     const data = { message: msg, url, timestamp, endpoint }
-    window.location.href = "../api/error?" + new URLSearchParams(data).toString();
+    window.location.href = "./api/error?" + new URLSearchParams(data).toString();
 }
 
 function localError(msg, url) {
