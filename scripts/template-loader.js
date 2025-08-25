@@ -1,7 +1,7 @@
 const templates = new Map()
 
 function getTemplatePath(name) {
-    return `../templates/${name}.html`
+    return `./templates/${name}.html`
 }
 
 async function loadTemplate(name) {
