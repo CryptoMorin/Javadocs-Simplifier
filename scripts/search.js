@@ -1,4 +1,5 @@
-import { load } from "./javadocs-loader.js";
+import { JavadocsLoader, JavaDocsLoadError } from "./javadocs-loader.js";
+import { BG_MUSIC } from "./index.js";
 
 const input = document.getElementById('query');
 const btn = document.getElementById('go');
@@ -93,7 +94,6 @@ function startProgress() {
     rafId = requestAnimationFrame(loop);
     startMessages();
     disableUI();
-    return finishProgress;
 }
 
 function finishProgress() {
@@ -122,23 +122,62 @@ function hideProgress() {
     if (rafId) cancelAnimationFrame(rafId)
 }
 
-function doSearch() {
+async function doSearch() {
     if (btn.disabled) return; // already running or permanently disabled
     const q = input.value.trim()
     if (!q) {
         showError('Please type something to search.');
         return;
     }
+
+    // We can't move the progress bar after try-catch, then it wouldn't 
+    // show at all because everything is loaded.
     clearError()
-    const done = startProgress()
-    // Simulate work; replace with real navigation if desired
-    setTimeout(() => { done(); }, 1200 + Math.random() * 900)
-    load(q)
+    startProgress()
+    setTimeout(() => finishProgress(), 1200 + Math.random() * 900)
+
+    try {
+        await new JavadocsLoader().load(q)
+    } catch (error) {
+        let finalErrorMsg = error.toString()
+
+        if (error instanceof Error) {
+            finalErrorMsg = error.message
+        }
+
+        if (error instanceof JavaDocsLoadError) {
+            switch (error.isValidJavadocs) {
+                case false:
+                    finalErrorMsg = "The provided URL doesn't point to a JavaDocs: " + finalErrorMsg
+                    break
+                case true:
+                    finalErrorMsg = "Failed to load JavaDocs: " + finalErrorMsg
+                    break
+            }
+        } else {
+            console.error(error)
+        }
+
+        showError(finalErrorMsg)
+        return;
+    }
+
+    BG_MUSIC.pause()
 }
 
+function redirectReload() {
+    const redirect = sessionStorage.getItem('JavaDocsSimplifier.redirect')
+    if (!redirect) return
+
+    sessionStorage.removeItem('JavaDocsSimplifier.redirect')
+    input.value = redirect
+    doSearch()
+}
 
 /** Search interactions: keep disabled even after finish + smooth progress that stays visible + funny loading messages + empty-input error **/
 export function runModule() {
+    redirectReload()
+
     exampleText.addEventListener("click", () => {
         const searchBar = document.getElementById('query')
         searchBar.value = exampleText.textContent

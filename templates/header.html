@@ -1,0 +1,148 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="../styles/header.css">
+</head>
+
+<body>
+    <canvas class="page-color-fill"></canvas>
+    <header>
+        <div class="logo-text">JavaDocs Simplifier</div>
+        <div class="nav-buttons">
+            <button id="home-button">Home</button>
+            <!-- Info button -->
+            <div class="button-container">
+                <button id="info-button" class="button" type="button">Info</button>
+                <span class="popup-text pop-text-wide">
+                    This website is used for taking published JavaDocs .html pages and
+                    removing unnecessary elements and changing some elements to make it
+                    easier for end-users to use the information. The most common information
+                    that developers can provide end-users without making an entire separate
+                    wiki about them are fields and specifically enums.
+                </span>
+            </div>
+            <button id="reload-button" style="display: none;">Reload</button>
+
+            <div class="theme-toggle-container">
+                <span>☀️</span>
+                <div class="theme-toggle">
+                    <div class="toggle-dot"></div>
+                </div>
+                <span>🌙</span>
+            </div>
+            <div class="vertical-separator"></div>
+            <div class="color-picker-btn"></div>
+            <template-anchor template="color-picker" inline></template-anchor>
+        </div>
+    </header>
+    <script type="module">
+        import { waitUntil } from './scripts/template-loader.js';
+        import { WavyCircle } from './scripts/page-color-fill.js';
+        import { ThemeGenerator } from './scripts/theme-generator.js';
+        const container = await waitUntil(() => document.querySelector('.color-picker.container'))
+        const colorBtn = document.querySelector('.color-picker-btn')
+        const javadocsView = document.querySelector('iframe.javadocs-view');
+        let headerTheme = null;
+        let dontRedirect = false;
+        let currentThemeSettings = {
+            filter: (element) => !container.contains(element) && !colorBtn.contains(element),
+        };
+
+        function saveRedirect() {
+            const javadocsLoader = javadocsView.contentWindow['JavaDocs'].loaderInstance
+            // sessionStorage survives hard-reloads!
+            sessionStorage.setItem('JavaDocsSimplifier.redirect', javadocsLoader.inputUrl)
+        }
+
+        export async function addDevControls() {
+            let request;
+            try {
+                request = await fetch('/is_dev', { method: 'GET' })
+            } catch (error) {
+                return
+            }
+
+            if (request.ok) {
+                const answer = await request.text()
+                if (answer === "yes") {
+                    console.log("Initiating Dev Controls...")
+                    const reloadBtn = document.getElementById('reload-button')
+                    reloadBtn.style.display = 'inline-flex'
+                    reloadBtn.addEventListener("click", () => {
+                        saveRedirect()
+                        dontRedirect = true // We're already doing it
+                        window.location.reload(true)
+                    })
+                }
+            }
+        }
+        addDevControls()
+
+        document.querySelectorAll('iframe').forEach(frame => {
+            frame.contentWindow.addEventListener('mousedown', clickAnywhere);
+        });
+        window.addEventListener('mousedown', clickAnywhere);
+
+        document.getElementById('home-button').addEventListener('click', () => {
+            dontRedirect = true
+            // We are technically in the home page.
+            window.location.reload()
+        });
+
+        function clickAnywhere(event) {
+            const clickedElement = event.target;
+            if (!colorBtn.contains(clickedElement) && !container.contains(clickedElement)) {
+                container.classList.remove('show')
+            }
+        }
+
+        colorBtn.addEventListener('click', () => {
+            container.classList.add('show')
+        })
+
+        function updateTheme(settings) {
+            const javadocsLoader = javadocsView.contentWindow['JavaDocs'].loaderInstance
+            javadocsLoader.updateTheme(javadocsView.contentDocument, settings)
+
+            const previous = headerTheme
+            const lastOfUs = previous?.disableAnimations()
+            headerTheme?.delete()
+            headerTheme = null
+            Object.assign(currentThemeSettings, settings)
+            if (currentThemeSettings.darkTheme || currentThemeSettings.mainColor) {
+                // We still need 100ms, not sure why.
+                setTimeout(() => {
+                    headerTheme = new ThemeGenerator(document, currentThemeSettings)
+                    headerTheme.generate()
+                    previous?.enableAnimations(lastOfUs)
+                }, 100);
+            }
+        }
+
+        document.body.querySelector('.theme-toggle').addEventListener('click', () => {
+            const classes = document.body.classList
+            const wasDarkTheme = classes.contains('dark-theme')
+            classes.toggle('dark-theme');
+            updateTheme({ darkTheme: !wasDarkTheme })
+        })
+
+        container.addEventListener('colorchange', event => {
+            const hex = event.detail.hex
+            colorBtn.style.background = hex
+            const settings = {
+                onFillPhase: () => {
+                    updateTheme({ mainColor: hex })
+                }
+            }
+            new WavyCircle(document.querySelector('canvas.page-color-fill'), hex, settings).run()
+        })
+
+        try {
+            // Handle reloads. Will cause issues when the user manually presses ENTER
+            // on the URL link to load the home page.
+            window.addEventListener('beforeunload', (event) => {
+                if (!dontRedirect) saveRedirect()
+            });
+        } catch (error) {
+            console.log(error)
+        }
+    </script>
+</body>

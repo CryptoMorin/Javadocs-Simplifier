@@ -1,5 +1,5 @@
-export { runModule as javadocsModule } from './javadocs-loader.js'
+export { runModule as indexModule } from './index.js'
 export { runModule as searchModule } from './search.js'
-export { runModule as contextMenuModule } from './context-menu.js'
+// export { runModule as contextMenuModule } from './context-menu.js'
 export { runModule as backgroundModule } from './background.js'
-export { runModule as apiModule, handleError as apiErrorModule } from './api.js'
+// export { runModule as apiModule, handleError as apiErrorModule } from './api.js'

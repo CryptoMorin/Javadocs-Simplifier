@@ -4,4 +4,10 @@
     --text: #c7d2fe;
     --muted: #94a3b8;
     --shadow: 0 10px 40px rgba(0, 0, 0, .5);
+    --no-value-bg:
+        linear-gradient(to bottom right, transparent 8%, red 8%, red 12%, transparent 12%),
+        linear-gradient(to bottom right, transparent 28%, red 28%, red 32%, transparent 32%),
+        linear-gradient(to bottom right, transparent 48%, red 48%, red 52%, transparent 52%),
+        linear-gradient(to bottom right, transparent 68%, red 68%, red 72%, transparent 72%),
+        linear-gradient(to bottom right, transparent 88%, red 88%, red 92%, transparent 92%);
 }

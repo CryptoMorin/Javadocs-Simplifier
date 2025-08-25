@@ -1,0 +1,90 @@
+/* Base dark theme styles */
+html,
+body {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+/* Common elements */
+p,
+span,
+div,
+a,
+li,
+ul,
+td,
+th,
+label,
+input,
+textarea,
+select,
+section,
+option {
+    color: #e0e0e0 !important;
+    background-color: #111111 !important;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #ffffff !important;
+}
+
+/* Links */
+a {
+    color: #4da8ff !important;
+}
+
+a:hover {
+    color: #80bfff !important;
+}
+
+/* Buttons */
+button,
+input[type="button"],
+input[type="submit"] {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #555555 !important;
+}
+
+/* Form elements */
+input,
+textarea,
+select {
+    border: 1px solid #555555 !important;
+    background-color: #333333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Tables */
+table {
+    border-color: #444444 !important;
+}
+
+tr,
+td,
+th {
+    border-color: #444444 !important;
+    background-color: #2d2d2d !important;
+}
+
+/* Override common light theme backgrounds */
+*[style*="background"],
+*[style*="background-color"] {
+    background-color: #2d2d2d !important;
+}
+
+/* Override common light theme text colors */
+*[style*="color"] {
+    color: #e0e0e0 !important;
+}
+
+/* Images with transparency */
+img {
+    background-color: #2d2d2d !important;
+}

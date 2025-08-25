@@ -1,0 +1,30 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="../styles/color-picker.css">
+    <script type="module" src="../scripts/color-picker.js"></script>
+</head>
+
+<body>
+    <div class="color-picker container">
+        <div class="preview no-color"></div>
+        <div class="sv-picker">
+            <canvas width="200" height="200"></canvas>
+            <div class="sv-handle" id="sv-handle"></div>
+        </div>
+        <div class="hue-slider">
+            <input type="range" class="hue" min="0" max="360" value="0">
+        </div>
+        <div class="predefined-colors">
+            <div class="swatch" style="background-color: #ff0000;"></div>
+            <div class="swatch" style="background-color: #00ff00;"></div>
+            <div class="swatch" style="background-color: #0000ff;"></div>
+            <div class="swatch" style="background-color: #2b6ec5;"></div>
+            <div class="swatch" style="background-color: #ffff00;"></div>
+            <div class="swatch" style="background-color: #ff00ff;"></div>
+            <div class="swatch" style="background-color: #00ffff;"></div>
+            <div class="swatch" style="background-color: #66ff00;"></div>
+            <div class="swatch" style="background-color: #ffa500;"></div>
+            <div class="swatch no-color"></div>
+        </div>
+        <input type="text" class="hex" readonly>
+    </div>
+</body>

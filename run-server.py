@@ -65,6 +65,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', f'https://localhost:{PORT}') 
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header("Content-Security-Policy", "media-src 'self' blob:;")
+        self.send_header("Cache-Control", "no-cache, no-store")
         super().end_headers()
 
     def do_OPTIONS(self):

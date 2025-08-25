@@ -41,31 +41,10 @@
 /* Error pulse + shake */
 .search-wrap.error {
     box-shadow: 0 0 0 2px rgba(239, 68, 68, .5), var(--shadow);
-    animation: shake .35s ease;
-}
 
-@keyframes shake {
-
-    10%,
-    90% {
-        transform: translateX(-1px)
-    }
-
-    20%,
-    80% {
-        transform: translateX(2px)
-    }
-
-    30%,
-    50%,
-    70% {
-        transform: translateX(-3px)
-    }
-
-    40%,
-    60% {
-        transform: translateX(3px)
-    }
+    /* Imported from animations.css */
+    /* Note: slideInFromBelow is also added to prevent triggering it again. */
+    animation: slideInFromBelow 0s ease-in, shake .35s ease;
 }
 
 /* Fancy gradient border on hover using a pseudo-element */
